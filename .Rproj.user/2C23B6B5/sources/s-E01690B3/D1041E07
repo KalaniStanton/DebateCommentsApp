@@ -1,0 +1,24 @@
+{
+    "id": "D1041E07",
+    "path": "~/School/Spring21/DataViz/DV_Exercises/DebateCommentsApp/DebComms_ShinyApp/ui.R",
+    "project_path": "DebComms_ShinyApp/ui.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1618349023160.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "cursorPosition": "9,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1596033174,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1596033174,
+    "read_only": false,
+    "read_only_alternatives": []
+}

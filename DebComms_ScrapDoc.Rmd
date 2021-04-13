@@ -1,0 +1,35 @@
+---
+title: "Work Space For Analysis"
+author: "Kalani Stanton, Sara Haman, Julian Palazzo, Vivenne Prince"
+date: "4/13/2021"
+output: html_document
+---
+
+# Analyzing Comments from Political Livestreams
+
+```{r}
+library(shiny)
+library(Hmisc)
+library(tidyverse)
+library(shinydashboard)
+```
+
+
+
+```{r}
+DebateComments <- read_csv("Data/debate_streaming.csv")
+
+str(DebateComments)
+```
+
+```{r}
+contents(DebateComments)
+```
+
+## Kalani
+
+## Sara
+
+## Vivienne
+
+## Julian
