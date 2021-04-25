@@ -1,0 +1,140 @@
+---
+title: "JP_working"
+author: "Julian Palazzo"
+date: "4/25/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+
+## Libraries
+
+```{r}
+library(dplyr)
+library(tidyverse)
+library(tidytext)
+
+```
+
+
+My Starting Code
+```{r}
+proj.dir <- "/Users/julianpalazzo/New College of Florida/Spring Semester 2021/Data Visualization/Final_Project"
+data.dir <- "data/dataverse_files"
+
+
+comments <- read_csv(file.path(proj.dir, data.dir, "debate_streaming.csv"))
+
+head(comments)
+
+```
+
+Cleaning code
+```{r}
+DebateComments <- comments
+
+################################################################################
+
+library(dplyr)
+`%notin%` <- negate(`%in%`)
+
+UniqueComments <- DebateComments %>% 
+        distinct(text_id, .keep_all = TRUE)
+
+DebateBigrams <- UniqueComments %>% 
+  unnest_tokens(bigram, comments, token = "ngrams", n = 2, n_min = 2)
+
+sw <- stop_words$word
+
+## Remove Stop Words
+DebateBigrams_split <- DebateBigrams %>% 
+   separate(bigram, c("word1", "word2"), sep = " ") %>% 
+   dplyr::filter(word1 %notin% sw & word2 %notin% sw)
+
+DebateBigrams_noSW <- DebateBigrams_split %>% unite(bigram, c("word1", "word2"), sep = " ")
+
+################################################################################
+require(tidytext)
+data(stop_words)
+
+UniqueComments <- DebateComments %>% 
+        distinct(text_id, .keep_all = TRUE)
+
+dim(UniqueComments)
+
+DebateTokens <- UniqueComments %>% 
+        unnest_tokens(word, comments) 
+
+library(stringi)
+DebateTokens$network <- substr(DebateTokens$debate, 0, 3)
+
+DebateTokens_noSW <- DebateTokens%>% 
+        anti_join(stop_words, by = "word")
+
+dim(DebateTokens_noSW)
+```
+
+
+```{r}
+
+# Returns the record with the highest sentiment score for each comment
+sentiment.df <- comments %>%
+  group_by(text_id) %>%
+  filter(scores == max(scores)) 
+  
+sentiment.df <- sentiment.df %>%
+  group_by(variables)%>%
+  mutate(total_likes = sum(likes, na.rm=TRUE), sentiment = fct_lump(variables, n=5))
+
+
+
+ggplot(sentiment.df, aes(x=fct_infreq(fct_lump(variables, n=5)), y=total_likes)) + geom_bar(stat='identity') #+ facet_wrap(vars(id))
+
+nrow(filter(sentiment.df, likes > 0))
+
+ggplot(sentiment.df, aes(likes)) + geom_histogram(binwidth = 1) + facet_wrap(vars(fct_infreq(variables)))
+
+```
+
+
+```{r}
+require(stringi)
+sentiment.df$network <- substr(sentiment.df$debate, 0, 3)
+
+ggplot(sentiment.df, aes(x=network)) + geom_bar(stat='count')
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
