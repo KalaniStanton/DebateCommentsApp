@@ -39,3 +39,6 @@ vignettes/*.pdf
 .Renviron
 *.csv
 .DS_Store
+temp_wordcloud/dataverse_files
+temp_wordcloud/dataverse_files/jqd_analysis_main_paper.R
+temp_wordcloud/dataverse_files/README.md
