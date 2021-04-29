@@ -1,13 +1,10 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
+library(tidyverse)
 library(shiny)
+library(plotly)
+
+
+df <- read_csv(file.path('dataverse_files/debate_streaming.csv')) 
+
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(

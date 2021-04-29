@@ -1,0 +1,28 @@
+---
+title: "Word Cloud Notebook"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+    theme: cosmo
+---
+
+```{r setup, include=FALSE, warning=FALSE, echo=TRUE}
+knitr::opts_chunk$set(cache = T)
+options(warn=-1)
+library(tidyverse)
+library(shiny)
+library(plotly)
+library(reshape)
+library(tm)
+library(wordcloud)
+
+datapath <- '/Users/viv/Downloads/DATA'
+```  
+
+# Data Cleaning
+```{r}
+df <- read_csv(file.path('dataverse_files/debate_streaming.csv')) 
+```
+
+# Testing vizualizations
