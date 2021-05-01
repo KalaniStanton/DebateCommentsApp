@@ -157,7 +157,7 @@ ts.df %>%
   arrange(desc(n))
 
 ts.df %>% 
-  filter(correction == "VP") %>%
+  filter(correction == "Chris") %>%
   group_by(word, correction) %>%
   count() %>%
   arrange(desc(n))
@@ -172,9 +172,24 @@ final edits
 ts.df <- ts.df %>% filter(correction != "")
 ```
 
-
+# Viz testing
 ```{r}
-wordcloud2(data = demoFreq)
+# wordcloud2(data = demoFreq)
+
+debate.options <- unique(ts.df$debate)
+temp.tab <- ts.df %>% filter(debate == debate.options[4]) %>% select(correction) %>% count(correction, name = "freq") %>% arrange(desc(freq))
+
+temp.tab %>% wordcloud2(fontFamily = "didot", 
+                        size = 5,  # <--------------- adjustable parameter "zoom" [1, 10]
+                        minSize = 3,
+                        rotateRatio = .15,
+                        gridSize = 7.5,
+                        ellipticity = 1,
+                        backgroundColor = "#F0F3F5",
+                        color = c("#181D27","#272F3F","#08090D","#2D334E"))
+
+head(temp.tab %>% mutate(freq = paste0(round (freq / sum(freq)*100, digits=1), "%")), 100)
+
 ```
 
 
