@@ -64,7 +64,7 @@ tokenized.singularized.df <- tokenized.df%>%
 # left_join(get_sentiments("nrc"))  # sentiment analysis
 ```
 
-spelling correction
+#### Spelling correction
 ```{r}
 correct_spelling <- function(input) {
   output <- case_when(
@@ -91,13 +91,87 @@ tss.df %>% filter(word != correction)
 # spell corrected non-singularized and remove posessives
 ts.df <- tokenized.df %>% 
   mutate(correction = correct_spelling(word))
-  
-
-manual.retention <- c("unpresidential", "unamerican", "smh")
-ts.df %>% 
-  mutate(correction = ifelse(word %in% manual.retention, word, correction)) %>% 
-  filter(word != correction)
+# write.csv(ts.df,'ts_df.csv')
+# ts.df <- read_csv(file.path('ts_df.csv')) 
 ```
+Manual spelling corrections
+```{r}
+manual.retention <- c("unpresidential", "unamerican", "smh","nyt","abcnews","hes", "dt","letherspeak","jorgensen","jo","mfker","yrs","meds","covid","lol","dems","anymore","trump2020","lmao","wtf","blm","pos","yall","dem","maga","favor","haha","harris2020","antifa","stfu","dr","hahaha","wth","everytime","favoring","soooo","nobel","potus","aoc","favorite","behavior","dang","asshole","defund","tf","lockdown","aca","idk","hiden","labor","dnc","cheeto","kavanaugh","snl","lmao","sooo","aint","ppe","plexiglass","lil")
+ts.df <- ts.df %>% 
+  mutate(correction = ifelse(word %in% manual.retention, word, correction)) %>% 
+  mutate(correction = case_when(
+    word == "bidens" ~ "Biden",
+    TRUE ~ correction
+  )) %>%
+  mutate(correction = case_when(
+    word == "lieing"~ "lying",
+    word == "kool"~ "cool",
+    word == "kamala"~ "Kamala",
+    word == "ppl"~ "people",
+    word == "pelosi"~ "Pelosi",
+    word == "dont"~ "",
+    word == "im"~ "",
+    word == "didnt"~ "",
+    word == "doesnt"~ "",
+    word == "lier"~ "liar",
+    word == "texas"~ "Texas",
+    word == "paris"~ "Paris",
+    word == "joes"~ "Joe",
+    word == "covid19"~ "covid",
+    word == "korea"~ "Korea",
+    word == "cuz"~ "",
+    word == "fauci"~ "Fauci",
+    word == "whats"~ "",
+    word == "isnt"~ "",
+    word == "sooooo"~ "sooo",
+    word == "soo"~ "sooo",
+    word == "pense"~ "Pence",
+    word == "u.s"~ "America",
+    word == "isnt"~ "",
+    word == "defunding"~ "defund",
+    word == "melania"~ "Melania",
+    word == "breonna"~ "Breonna",
+    word == "tho"~ "",
+    word == "ivanka"~ "Ivanka",
+    word == "cuomo"~ "Cuomo",
+    word == "gov"~ "government",
+    word == "hitler"~ "Hitler",
+    word == "hahahaha"~ "hahaha", 
+    word == "hasnt"~ "",
+    word == "pls"~ "please",
+    TRUE ~ correction
+  )) %>%
+  mutate(correction = case_when(
+    word == "trump"~ "Trump",
+    word == "pence"~ "Pence",
+    TRUE ~ correction
+  ))
+```
+
+Spelling QC
+```{r}
+ts.df %>% 
+  filter(word != tolower(correction) & !correction == '') %>%
+  group_by(word, correction) %>%
+  count() %>%
+  arrange(desc(n))
+
+ts.df %>% 
+  filter(correction == "VP") %>%
+  group_by(word, correction) %>%
+  count() %>%
+  arrange(desc(n))
+
+ts.df %>% 
+  count(correction) %>%
+  arrange(desc(n))
+```
+
+final edits
+```{r}
+ts.df <- ts.df %>% filter(correction != "")
+```
+
 
 ```{r}
 wordcloud2(data = demoFreq)
