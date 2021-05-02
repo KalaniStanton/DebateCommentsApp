@@ -60,7 +60,7 @@ server <- function(input, output, session) {
       select(correction) %>%
       count(correction, name = "Frequency") %>%
       arrange(desc(Frequency)) %>%
-      rename(c("correction" = "Word")) %>%
+      rename(c("Word" = "correction")) %>%
       mutate(Proportion = paste0(round (Frequency / sum(Frequency) * 100, digits = 1), "%"))
   })
 }
