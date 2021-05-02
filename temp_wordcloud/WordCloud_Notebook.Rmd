@@ -2,7 +2,7 @@
 title: "Word Cloud Notebook"
 output:
   html_document:
-    code_folding: hide
+    code_folding: show
     df_print: paged
     theme: cosmo
 ---
@@ -10,10 +10,8 @@ output:
 ```{r setup, include=FALSE, warning=FALSE, echo=TRUE}
 knitr::opts_chunk$set(cache = T)
 options(warn=-1)
-library(tidyverse)
 library(shiny)
 library(plotly)
-library(reshape)
 library(tm)
 library(wordcloud)
 library(tidytext)
@@ -21,20 +19,24 @@ library(wordcloud2)
 library(hunspell)
 library(purrr)
 library(pluralize)
+library(tidyverse)
 
 datapath <- '/Users/viv/Downloads/DATA'
 ```  
 
-# Data Cleaning
+# Debate Comments App: WordCloud Tab {.tabset}
+
+## Data Cleaning
 
 #### import data
-```{r}
-df <- read_csv(file.path('dataverse_files/debate_streaming.csv')) 
+```{r, message = FALSE}
+# df <- read_csv(file.path('dataverse_files/debate_streaming.csv')) 
+ts.df <- read_csv(file.path('ts_df.csv')) 
 ```
 
 
 #### basic text scrub
-```{r}
+```{r, eval = FALSE, echo = TRUE}
 tokenized.df <- df %>% 
   distinct(text_id, .keep_all= TRUE) %>%  # remove duplicate comments
   select(comments, debate) %>%
@@ -53,19 +55,19 @@ tokenized.df <- df %>%
 ```
 
 singularize
-```{r}
+```{r, eval = FALSE, echo = TRUE}
 tokenized.singularized.df <- tokenized.df%>% 
   mutate(correction = singularize(word)) %>% 
   mutate(correction = gsub("[']$", "", correction)) %>% 
   filter(correction != word)
 ```
 
-```{r}
+```{r, eval = FALSE, echo = FALSE}
 # left_join(get_sentiments("nrc"))  # sentiment analysis
 ```
 
 #### Spelling correction
-```{r}
+```{r, eval = FALSE, echo = TRUE}
 correct_spelling <- function(input) {
   output <- case_when(
     # manual corrections
@@ -94,10 +96,11 @@ ts.df <- tokenized.df %>%
 # write.csv(ts.df,'ts_df.csv')
 # ts.df <- read_csv(file.path('ts_df.csv')) 
 ```
+
 Manual spelling corrections
-```{r}
+```{r, eval =F}
 manual.retention <- c("unpresidential", "unamerican", "smh","nyt","abcnews","hes", "dt","letherspeak","jorgensen","jo","mfker","yrs","meds","covid","lol","dems","anymore","trump2020","lmao","wtf","blm","pos","yall","dem","maga","favor","haha","harris2020","antifa","stfu","dr","hahaha","wth","everytime","favoring","soooo","nobel","potus","aoc","favorite","behavior","dang","asshole","defund","tf","lockdown","aca","idk","hiden","labor","dnc","cheeto","kavanaugh","snl","lmao","sooo","aint","ppe","plexiglass","lil")
-ts.df <- ts.df %>% 
+ts.df <- ts.imported.df %>% 
   mutate(correction = ifelse(word %in% manual.retention, word, correction)) %>% 
   mutate(correction = case_when(
     word == "bidens" ~ "Biden",
@@ -149,7 +152,7 @@ ts.df <- ts.df %>%
 ```
 
 Spelling QC
-```{r}
+```{r, eval = F}
 ts.df %>% 
   filter(word != tolower(correction) & !correction == '') %>%
   group_by(word, correction) %>%
@@ -168,19 +171,25 @@ ts.df %>%
 ```
 
 final edits
-```{r}
+```{r, eval = F}
 ts.df <- ts.df %>% filter(correction != "")
+
+ts.df <- ts.df %>%
+  mutate(channel = substr(debate, 1, 3)) %>%
+  select(channel, debate, word, correction)
+
+unique(ts.df$channel)
+
+# write.csv(ts.df,'ts_df.csv')
 ```
 
-# Viz testing
+## Viz testing
 ```{r}
-# wordcloud2(data = demoFreq)
-
 debate.options <- unique(ts.df$debate)
 temp.tab <- ts.df %>% filter(debate == debate.options[4]) %>% select(correction) %>% count(correction, name = "freq") %>% arrange(desc(freq))
 
 temp.tab %>% wordcloud2(fontFamily = "didot", 
-                        size = 5,  # <--------------- adjustable parameter "zoom" [1, 10]
+                        size = 1,  # <--------------- adjustable parameter "zoom" [1, 10]
                         minSize = 3,
                         rotateRatio = .15,
                         gridSize = 7.5,
@@ -189,7 +198,75 @@ temp.tab %>% wordcloud2(fontFamily = "didot",
                         color = c("#181D27","#272F3F","#08090D","#2D334E"))
 
 head(temp.tab %>% mutate(freq = paste0(round (freq / sum(freq)*100, digits=1), "%")), 100)
+```
 
+## App Code
+
+```{r, eval = FALSE, class.source = 'fold-show'}
+library(shiny)
+
+# MAIN
+ts.df <- read_csv(file.path('ts_df.csv')) 
+channel.options <- unique(ts.df$channel)
+channel.options.pretty <- c("ABC","Fox","NBC")
+wordcloud_backgroundcolor <- "#F0F3F5"  # <------------------------- color options for sara
+wordcloud_textpallete <- c("#181D27","#272F3F","#08090D","#2D334E")  # <------------------------- color options for sara
+
+# UI
+ui <- fluidPage(
+  sidebarLayout(
+        sidebarPanel(
+            sliderInput("usr.zoom",
+                        "Word Cloud Zoom in/ out: ",
+                        min = 1,
+                        max = 10,
+                        value = 1),
+            selectInput("usr.channel", 
+                        "Channel:",
+                        choices = channel.options.pretty,
+                        selected = "ABC")
+        ),
+
+        # Show a plot of the generated distribution
+        mainPanel(
+           wordcloud2Output("wcloud"),
+           HTML("<br><br><br>"),
+           dataTableOutput('table')
+        )
+    )
+)
+
+# SERVER
+server <- function(input, output, session) {
+  output$wcloud <- renderWordcloud2({
+        usr.channel.no <- which(channel.options.pretty == input$usr.channel)
+        temp.tab <- ts.df %>% 
+                      filter(channel == channel.options[usr.channel.no]) %>% 
+                      select(correction) %>% count(correction, name = "freq") %>%
+                      arrange(desc(freq))
+
+        temp.tab %>% wordcloud2(fontFamily = "didot", 
+                        size = input$usr.zoom,  # <--------------- adjustable parameter "zoom" [1, 10]
+                        minSize = 3,
+                        rotateRatio = .15,
+                        gridSize = 7.5,
+                        ellipticity = 1,
+                        backgroundColor = wordcloud_backgroundcolor,
+                        color = wordcloud_textpallete)
+    })
+  
+  output$table <- renderDataTable({
+    temp.tab <- ts.df %>% 
+      filter(channel == channel.options[usr.channel.no]) %>%
+      select(correction) %>%
+      count(correction, name = "Frequency") %>%
+      arrange(desc(Frequency)) %>%
+      rename(c("correction" = "Word")) %>%
+      mutate(Proportion = paste0(round (Frequency / sum(Frequency) * 100, digits = 1), "%"))
+  })
+}
+
+shinyApp(ui, server)
 ```
 
 
