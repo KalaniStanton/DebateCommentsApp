@@ -55,6 +55,7 @@ server <- function(input, output, session) {
   })
   
   output$table <- renderDataTable({
+    usr.channel.no <- which(channel.options.pretty == input$usr.channel)
     temp.tab <- ts.df %>% 
       filter(channel == channel.options[usr.channel.no]) %>%
       select(correction) %>%
