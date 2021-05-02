@@ -4,38 +4,78 @@ library(tidyverse)
 
 datapath <- '/Users/viv/Downloads/DATA'
 
-# MAIN
+# ================================ MAIN =======================================
 ts.df <- read_csv(file.path('ts_df.csv'))  # <------------------ data import (ts.df)
 channel.options <- unique(ts.df$channel)
 channel.options.pretty <- c("ABC","Fox","NBC")
-wordcloud_backgroundcolor <- "#F0F3F5"  # <------------------------- color options for sara
-wordcloud_textpallete <- c("#181D27","#272F3F","#08090D","#2D334E")  # <------------------------- color options for sara
 
-# UI
+# wordcloud aesthetics 
+wordcloud_backgroundcolor <- "#F0F3F5"  # <------------------------- word cloud color options for sara
+wordcloud_textpallete <- c("#181D27","#272F3F","#08090D","#2D334E")  # <------------------------- word cloud color options for sara
+wordcloud_font <- "didot"  # <------------------------- word cloud font option for sara
+
+# page text
+vtitle <- "Word Usage In Comments By Channel"
+
+vheader.cloud <- "The word cloud below illustrates word frequency in the comments data by size"
+vpdiscription.cloud <- "Comments were tokenized, spelling corrected, and had stop words removed. The spelling check was manually verified for the top 50 words used in the comments (please see the GitHub for data mining details)."
+vheader.table <- "Word frequencies by channel (descending)"
+vpdiscription.table <- "This table lists word usage in the comments ranked by popularity. This is the data that is being visualized by the word cloud above."
+  
+vheader <- "Explore diction in the comments by channel: "
+vpdiscription <- "The below options updates the wordcloud and table to the right based on selection."
+vp1 <- "<b>Channel:</b> <br>The data captured comments from users streaming the debate on three major channels: ABC, Fox, and NBC. Select one of the channels below to see word frequencies used by their commenters."
+vp2 <- "<b>Wordcloud Zoom in/ out:</b> <br>Use this slider to explore the wordcloud to the right. By default, the wordcloud displays all words. To view and compare the frequency of the lesser used words, increase the zoom."
+
+
+
+# ================================ UI =======================================
 ui <- fluidPage(
+  
+  # title
+  titlePanel(vtitle),
+  
   sidebarLayout(
+    
+    # options
     sidebarPanel(
+      
+      h4(vheader),
+      p(vpdiscription),
+      HTML("<br>"),
+      
+      HTML(vp1),
+      selectInput("usr.channel", 
+                  "",
+                  choices = channel.options.pretty,
+                  selected = "ABC"),
+      HTML("<br><br>"),
+      
+      HTML(vp2),
       sliderInput("usr.zoom",
-                  "Word Cloud Zoom in/ out: ",
+                  "",
                   min = 1,
                   max = 10,
-                  value = 1),
-      selectInput("usr.channel", 
-                  "Channel:",
-                  choices = channel.options.pretty,
-                  selected = "ABC")
+                  value = 1)
     ),
     
-    # Show a plot of the generated distribution
+    # cloud and table
     mainPanel(
+      
+      h4(vheader.cloud),
+      p(vpdiscription.cloud),
       wordcloud2Output("wcloud"),
-      HTML("<br><br><br>"),
+      HTML("<br><br>"),
+      
+      h4(vheader.table),
+      p(vpdiscription.table),
       dataTableOutput('table')
     )
   )
 )
 
-# SERVER
+
+# ================================ SERVER =======================================
 server <- function(input, output, session) {
   output$wcloud <- renderWordcloud2({
     usr.channel.no <- which(channel.options.pretty == input$usr.channel)
@@ -44,7 +84,7 @@ server <- function(input, output, session) {
       select(correction) %>% count(correction, name = "freq") %>%
       arrange(desc(freq))
     
-    temp.tab %>% wordcloud2(fontFamily = "didot", 
+    temp.tab %>% wordcloud2(fontFamily = wordcloud_font, 
                             size = input$usr.zoom,  # <--------------- adjustable parameter "zoom" [1, 10]
                             minSize = 3,
                             rotateRatio = .15,
@@ -66,4 +106,6 @@ server <- function(input, output, session) {
   })
 }
 
+
+# ================================ APP CALL =======================================
 shinyApp(ui, server)
