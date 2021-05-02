@@ -55,7 +55,8 @@ shinyServer(function(input, output) {
       theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1)) +
       scale_y_continuous(limits = c(0,50),
                          labels=number_format(
-                           suffix="%"))
+                           suffix="%")) +
+      scale_fill_manual(values = c("green", "blue", "red"))
   })
   
 })
