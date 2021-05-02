@@ -2,7 +2,7 @@
 title: "Word Cloud Notebook"
 output:
   html_document:
-    code_folding: hide
+    code_folding: show
     df_print: paged
     theme: cosmo
 ---
@@ -24,7 +24,9 @@ library(tidyverse)
 datapath <- '/Users/viv/Downloads/DATA'
 ```  
 
-# Data Cleaning
+# Debate Comments App: WordCloud Tab {.tabset}
+
+## Data Cleaning
 
 #### import data
 ```{r, message = FALSE}
@@ -181,10 +183,8 @@ unique(ts.df$channel)
 # write.csv(ts.df,'ts_df.csv')
 ```
 
-# Viz testing
+## Viz testing
 ```{r}
-# wordcloud2(data = demoFreq)
-
 debate.options <- unique(ts.df$debate)
 temp.tab <- ts.df %>% filter(debate == debate.options[4]) %>% select(correction) %>% count(correction, name = "freq") %>% arrange(desc(freq))
 
@@ -200,7 +200,9 @@ temp.tab %>% wordcloud2(fontFamily = "didot",
 head(temp.tab %>% mutate(freq = paste0(round (freq / sum(freq)*100, digits=1), "%")), 100)
 ```
 
-```{r, eval = FALSE}
+## App Code
+
+```{r, eval = FALSE, class.source = 'fold-show'}
 library(shiny)
 
 # MAIN
@@ -265,11 +267,6 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
-```
-
-Scratch Work
-```{r, eval = F}
-usr.channel.no <- 1
 ```
 
 
