@@ -46,8 +46,8 @@ shinyServer(function(input, output, session) {
                    icon.size = if_else(name %in% input$rep_bigrams | name %in% input$dem_bigrams, 125, 75),
                    icon.color = if_else(name %in% input$dem_bigrams, "#000ce8", if_else(name %in% input$rep_bigrams, "#E00008", "black"))) %>% 
             activate(edges) %>% 
-            mutate(hoverWidth = n,
-                   selectionWidth = n,
+            mutate(hoverWidth = n/50,
+                   selectionWidth = n/50,
                    scaling.max = 5)
     })
     
