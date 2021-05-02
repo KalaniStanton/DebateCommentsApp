@@ -1,10 +1,15 @@
 library(shiny)
 
 library(scales)
+library(forcats)
+library(dplyr)
+library(tidyverse)
 
 
 # GLOBAL.R
-
+library(forcats)
+library(dplyr)
+library(tidyverse)
 sentiment.df <- comments %>%
   group_by(text_id) %>%
   filter(scores == max(scores)) 
@@ -48,6 +53,9 @@ shinyServer(function(input, output) {
   
   output$TotalLikesByNetworkPlot <- renderPlot({
     df <- networkData()
+    
+    networkColors <- c("abc" = "green", "fox" = "red", "nbc" = "blue")
+
     ggplot(df, aes(x=fct_infreq(fct_lump(variables, n=input$numberOfSentiments)), y=Percent, fill=network)) + 
       geom_bar(stat='identity', position='dodge') +
       ylab("Proportion of Likes") +
@@ -56,7 +64,7 @@ shinyServer(function(input, output) {
       scale_y_continuous(limits = c(0,50),
                          labels=number_format(
                            suffix="%")) +
-      scale_fill_manual(values = c("green", "blue", "red"))
+      scale_fill_manual(values = networkColors)
   })
   
 })
