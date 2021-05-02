@@ -3,13 +3,15 @@ library(shiny)
 library(scales)
 
 
+# GLOBAL.R
+
 sentiment.df <- comments %>%
-    group_by(text_id) %>%
-    filter(scores == max(scores)) 
+  group_by(text_id) %>%
+  filter(scores == max(scores)) 
 
 sentiment.df <- sentiment.df %>%
-    group_by(variables)%>%
-    mutate(total_likes = sum(likes, na.rm=TRUE), sentiment = fct_lump(variables, n=5))
+  group_by(variables)%>%
+  mutate(total_likes = sum(likes, na.rm=TRUE), sentiment = fct_lump(variables, n=5))
 
 
 
@@ -32,29 +34,28 @@ sentiment.df$variables[sentiment.df$variables == "SEXUALLY_EXPLICIT"] <- "Sexual
 require(stringi)
 sentiment.df$network <- substr(sentiment.df$debate, 0, 3)
 
-
+# END GLOBAL.R
 
 shinyServer(function(input, output) {
-    
-    networkData <- eventReactive(input$network, {
-        myNetwork <- input$network
-        df <- sentiment.df %>% 
-                group_by(network) %>%
-                mutate(Percent = 100*(likes/sum(likes, na.rm=TRUE))) %>%
-                filter(network == myNetwork)
-    })
-
-    output$TotalLikesByNetworkPlot <- renderPlot({
-        df <- networkData()
-        recode(df$variables, "Attack" = "ATTACK_ON_COMMENTER", "Attack" = "ATTACK_ON_AUTHOR", "Attack"="IDENTITY_ATTACK")
-        ggplot(df, aes(x=fct_infreq(fct_lump(variables, n=input$numberOfSentiments)), y=Percent)) + 
-            geom_bar(stat='identity') +
-            ylab("Proportion of Likes") +
-            xlab("Sentiment") +
-            theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1)) +
-            scale_y_continuous(limits = c(0,50),
-                               labels=number_format(
-                                   suffix="%"))
-    })
-
+  
+  networkData <- eventReactive(input$network, {
+    myNetwork <- input$network
+    df <- sentiment.df %>% 
+      group_by(network) %>%
+      mutate(Percent = 100*(likes/sum(likes, na.rm=TRUE))) %>%
+      filter(network %in% myNetwork)
+  })
+  
+  output$TotalLikesByNetworkPlot <- renderPlot({
+    df <- networkData()
+    ggplot(df, aes(x=fct_infreq(fct_lump(variables, n=input$numberOfSentiments)), y=Percent, fill=network)) + 
+      geom_bar(stat='identity', position='dodge') +
+      ylab("Proportion of Likes") +
+      xlab("Sentiment") +
+      theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1)) +
+      scale_y_continuous(limits = c(0,50),
+                         labels=number_format(
+                           suffix="%"))
+  })
+  
 })
