@@ -11,22 +11,7 @@ sentiment.df <- sentiment.df %>%
     group_by(variables)%>%
     mutate(total_likes = sum(likes, na.rm=TRUE), sentiment = fct_lump(variables, n=5))
 
-# # Recode Sentiment Categories
-# require(forcats)
-# fct_recode(sentiment.df$variables, "Incoherent"="INCOHERENT", 
-#            "Unsubstantial"="UNSUBSTANTIAL", 
-#            "Insult" = "INSULT", 
-#            "Obscene"="OBSCENE", 
-#            "Likely to Reject"="LIKELY_TO_REJECT", 
-#            "Inflammatory"="INFLAMMATORY", 
-#            "Attack on Commenter"="ATTACK_ON_COMMENTER", 
-#            "Threat"="THREAT", 
-#            "Attack on Author" = "ATTACK_ON_AUTHOR", 
-#            "Identity Attack" = "IDENTITY_ATTACK", 
-#            "Spam"="SPAM", "Flirtation"="FLIRTATION", 
-#            "Toxicity"="TOXICITY", 
-#            "Profanity"="PROFANITY", 
-#            "Sexually Explicit"="SEXUALLY_EXPLICIT")
+
 
 sentiment.df$variables[sentiment.df$variables == "INCOHERENT"] <- "Incoherent"
 sentiment.df$variables[sentiment.df$variables == "UNSUBSTANTIAL"] <- "Unsubstantial"
@@ -49,7 +34,6 @@ sentiment.df$network <- substr(sentiment.df$debate, 0, 3)
 
 
 
-# Define server logic required to draw a histogram
 shinyServer(function(input, output) {
     
     networkData <- eventReactive(input$network, {
@@ -71,11 +55,6 @@ shinyServer(function(input, output) {
             scale_y_continuous(limits = c(0,50),
                                labels=number_format(
                                    suffix="%"))
-        # plot(sentiment.df$sentiment, sentiment.df$total_likes)
-
-        # draw the histogram with the specified number of bins
-        # hist(x, breaks = bins, col = 'darkgray', border = 'white')
-
     })
 
 })
