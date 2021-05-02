@@ -18,6 +18,9 @@ rep_words <- c("republican", "republicans", "trump", "donald", "conservative", "
 political_words <- c(dem_words, rep_words)
 topic_words <- c("covid", "coronavirus", "healthcare")
 
+UniqueComments <- DebateComments %>% distinct(text_id, .keep_all = TRUE)
+dim(UniqueComments)
+
 DebateBigrams <- UniqueComments %>% 
   unnest_tokens(bigram, comments, token = "ngrams", n = 2, n_min = 2) %>%
   mutate(bigram = tolower(bigram))
