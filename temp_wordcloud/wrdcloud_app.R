@@ -17,14 +17,14 @@ wordcloud_font <- "didot"  # <------------------------- word cloud font option f
 # page text
 vtitle <- "Word Usage In Comments By Channel"
 
-vheader.cloud <- "The word cloud below illustrates word frequency in the comments data by size"
+vheader.cloud <- "The word cloud below illustrates word frequency in the comment data by size"
 vpdiscription.cloud <- "Comments were tokenized, spelling corrected, and had stop words removed. The spelling check was manually verified for the top 50 words used in the comments (please see the GitHub for data mining details)."
 vheader.table <- "Word frequencies by channel (descending)"
 vpdiscription.table <- "This table lists word usage in the comments ranked by popularity. This is the data that is being visualized by the word cloud above."
   
 vheader <- "Explore diction in the comments by channel: "
 vpdiscription <- "The below options updates the wordcloud and table to the right based on selection."
-vp1 <- "<b>Channel:</b> <br>The data captured comments from users streaming the debate on three major channels: ABC, Fox, and NBC. Select one of the channels below to see word frequencies used by their commenters."
+vp1 <- "<b>Channel:</b> <br>The data captured comments from users watching presidential debate livestreams on facebook hosted by one of the major channels: ABC, Fox, or NBC. Select one of the channels below to see word frequencies used by their commenters."
 vp2 <- "<b>Wordcloud Zoom in/ out:</b> <br>Use this slider to explore the wordcloud to the right. By default, the wordcloud displays all words. To view and compare the frequency of the lesser used words, increase the zoom."
 
 
