@@ -10,7 +10,7 @@ This shiny app employs a few methods for visualizing the data provided by Ventur
 
 ### Wordcloud (Most Frequent Tokens)
 
-The wordcloud 
+The wordcloud is meant to illustrate the most frequently used unigram tokens, with an interactive feature that allows the user to "zoom-in" and see words with lower frequency by excluding the most common tokens determined by the slider on the left.
 
 ### Bigram Co-occurence Network
 
@@ -18,7 +18,7 @@ This network shows the common word co-occurences so as to enable the user to ide
 
 ### Sentiment Approval
 
-The visualization on this tab presents the association between the most prevalent sentiment of a comment and the approval said comment receives from the collective. As such, this graph shows the proportion of 
+This plot shows the proportions of the total likes received by each network attributed to each of the sentiment categories. The user is provided a list of three major cable news networks from which they can choose any number of networks to plot in a side by side bar chart. Additionally, the user can use the slider to select the top number of sentiments they would like to plot based on their respective likes (using factor lump).
 
 ### Moral Foundations Sentiment
 
